@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultados de la Encuesta de Música</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+        }
+        h1 {
+            text-align: center;
+            padding: 20px;
+            background-color: #007BFF;
+            color: white;
+        }
+        .filters {
+            display: flex;
+            justify-content: center;
+            padding: 20px;
+        }
+        .filters label, .filters select {
+            margin: 0 10px;
+        }
+        table {
+            width: 90%;
+            margin: 20px auto;
+            border-collapse: collapse;
+            background-color: white;
+        }
+        th, td {
+            padding: 10px;
+            text-align: left;
+            border: 1px solid #ddd;
+        }
+        th {
+            background-color: #007BFF;
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+        #videoContainer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+        }
+        #videoContainer video {
+            width: 100%;
+            height: auto;
+        }
+        #content {
+            display: none;
+            padding: 20px;
+        }
+        .chart-container {
+            width: 250px;
+            height: 200px;
+            margin: 20px auto;
+        }
+    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div id="videoContainer">
+        <video id="introVideo" autoplay>
+            <source src="Blue & White Futuristic Gaming Channel Youtube Intro .mp4" type="video/mp4">
+            Tu navegador no soporta la etiqueta de video.
+        </video>
+    </div>
+
+    <div id="content">
+        <h1>Encuesta de Música</h1>
+
+        <!-- Filtro de Género -->
+        <div class="filters">
+            <label for="genderFilter">Filtrar por género:</label>
+            <select id="genderFilter">
+                <option value="Todos">Todos</option>
+                <option value="Hombre">Hombre</option>
+                <option value="Mujer">Mujer</option>
+            </select>
+
+            <!-- Filtro de Música -->
+            <label for="musicFilter">Filtrar por género de música:</label>
+            <select id="musicFilter">
+                <option value="Todos">Todos</option>
+                <option value="Rock">Rock</option>
+                <option value="Pop">Pop</option>
+                <option value="Pop español">Pop español</option>
+                <option value="Metal progresivo">Metal progresivo</option>
+                <option value="Hip/Hop">Hip/Hop</option>
+                <option value="Música Clasica">Música Clasica</option>
+                <option value="KPop">KPop</option>
+                <option value="Ranchera">Ranchera</option>
+                <option value="Eurobeat">Eurobeat</option>
+                <option value="Country">Country</option>
+            </select>
+        </div>
+
+        <!-- Tabla de Resultados -->
+        <table id="resultsTable">
+            <tr>
+                <th>Nombre</th>
+                <th>Grado</th>
+                <th>Sexo</th>
+                <th>Edad</th>
+                <th>Género de Música</th>
+                <th>Plataforma</th>
+                <th>Recomendación</th>
+            </tr>
+        </table>
+
+        <!-- Gráfico de Plataformas -->
+        <div class="chart-container">
+            <canvas id="platformChart"></canvas>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var data = [
+                {"Nombre": "Valentín", "Grado": "ASIR", "Sexo": "Hombre", "Edad": 23, "GeneroMusica": "Metal progresivo", "Plataforma": "Spotify"},
+                {"Nombre": "Erika Ocaña", "Grado": "Asir", "Sexo": "Mujer", "Edad": 18, "GeneroMusica": "Rock", "Plataforma": "Spotify"},
+                {"Nombre": "Rubén", "Grado": "ASIR", "Sexo": "Masculino", "Edad": 19, "GeneroMusica": "Hip/Hop", "Plataforma": "Spotify y Youtube"},
+                {"Nombre": "Jesus Manuel Poza", "Grado": "ASIR", "Sexo": "Hombre", "Edad": 23, "GeneroMusica": "Música Clasica", "Plataforma": "Spotify/Youtube"},
+                {"Nombre": "Emmanuel", "Grado": "ASIR 1º", "Sexo": "Hombre", "Edad": 21, "GeneroMusica": "KPop", "Plataforma": "Spotify"},
+                {"Nombre": "Daniel", "Grado": "ASIR", "Sexo": "Hombre", "Edad": 19, "GeneroMusica": "Eurobeat", "Plataforma": "Spotify"},
+                {"Nombre": "Iker", "Grado": "Asir", "Sexo": "Hombre", "Edad": 20, "GeneroMusica": "Pop", "Plataforma": "Spotify"},
+                {"Nombre": "Samuel Pereira Lopez", "Grado": "ASIR", "Sexo": "Hombre", "Edad": 21, "GeneroMusica": "Country", "Plataforma": "Spotify"},
+                {"Nombre": "Juan Pedro", "Grado": "ASIR", "Sexo": "Masculino", "Edad": 36, "GeneroMusica": "Pop español", "Plataforma": "Youtube"},
+                {"Nombre": "Alexis Camero", "Grado": "ASIR1", "Sexo": "M", "Edad": 41, "GeneroMusica": "Ranchera", "Plataforma": "Youtube"}
+            ];
+
+            var recommendations = {
+                "Pop español": "Amaral - El universo sobre mí",
+                "Pop" : "Michael Jackson Thriller",
+                "Rock": "Queen - Bohemian Rhapsody",
+                "Metal progresivo": "Dream Theater - Pull Me Under",
+                "Hip/Hop": "Eminem - Lose Yourself",
+                "Música Clasica": "Ludwig van Beethoven - Für Elise",
+                "KPop": "BTS - Dynamite",
+                "Ranchera": "Vicente Fernández - El Rey",
+                "Eurobeat": "Dave Rodgers - Deja Vu",
+                "Country" : "Sweet Home Alabama"
+            };
+
+            function filterResults() {
+                var genderFilter = document.getElementById('genderFilter').value;
+                var musicFilter = document.getElementById('musicFilter').value;
+                var resultsTable = document.getElementById('resultsTable');
+
+                // Limpiar tabla
+                resultsTable.innerHTML = `
+                    <tr>
+                        <th>Nombre</th>
+                        <th>Grado</th>
+                        <th>Sexo</th>
+                        <th>Edad</th>
+                        <th>Género de Música</th>
+                        <th>Plataforma</th>
+                        <th>Recomendación</th>
+                    </tr>
+                `;
+
+                // Filtrar datos
+                var filteredData = data.filter(function(item) {
+                    return (genderFilter === 'Todos' || item.Sexo === genderFilter) &&
+                           (musicFilter === 'Todos' || item.GeneroMusica === musicFilter);
+                });
+
+                // Mostrar datos filtrados
+                filteredData.forEach(function(item) {
+                    var row = resultsTable.insertRow();
+                    row.insertCell(0).textContent = item.Nombre;
+                    row.insertCell(1).textContent = item.Grado;
+                    row.insertCell(2).textContent = item.Sexo;
+                    row.insertCell(3).textContent = item.Edad;
+                    row.insertCell(4).textContent = item.GeneroMusica;
+                    row.insertCell(5).textContent = item.Plataforma;
+
+                    var recommendation = recommendations[item.GeneroMusica] || "Recomendación no disponible";
+                    row.insertCell(6).textContent = recommendation;
+                });
+            }
+
+            // Añadir eventos a los filtros
+            document.getElementById('genderFilter').addEventListener('change', filterResults);
+            document.getElementById('musicFilter').addEventListener('change', filterResults);
+
+            // Mostrar todos los resultados al cargar la página
+            filterResults();
+
+            // Ocultar el video y mostrar el contenido después de 5 segundos
+            setTimeout(function() {
+                document.getElementById('videoContainer').style.display = 'none';
+                document.getElementById('content').style.display = 'block';
+
+                // Inicializar gráfico de plataformas preferidas
+                var platformCtx = document.getElementById('platformChart').getContext('2d');
+                var platformData = {
+                    labels: ['Spotify', 'Youtube', 'Spotify y Youtube'],
+                    datasets: [{
+                        label: 'Plataformas',
+                        data: [
+                            data.filter(item => item.Plataforma.includes('Spotify') && !item.Plataforma.includes('Youtube')).length,
+                            data.filter(item => item.Plataforma.includes('Youtube') && !item.Plataforma.includes('Spotify')).length,
+                            data.filter(item => item.Plataforma.includes('Spotify') && item.Plataforma.includes('Youtube')).length,
+                        ],
+                        backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+                    }]
+                };
+                var platformChart = new Chart(platformCtx, {
+                    type: 'pie',
+                    data: platformData,
+                    options: {
+                        responsive: false,
+                        maintainAspectRatio: false,
+                    }
+                });
+            }, 5000);
+        });
+    </script>
+</body>
+</html>
